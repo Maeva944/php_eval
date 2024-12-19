@@ -1,34 +1,32 @@
 <?php
-    session_start();
-    require_once '../Database.php';
-    require_once 'header.php';
+session_start();
+require_once '../Database.php';
+require_once 'header.php';
+require_once '../classes/Utilisateur.php';
 
-    if($_SERVER['REQUEST_METHOD'] == 'POST'){
-        //Récupération des champs du formulaire
-        $username = htmlspecialchars($_POST['username']);
-        $password = htmlspecialchars($_POST['password']);
+$database = new Database();
+$pdo = $database->pdo;
 
-        //Vérification des champs vides
-        if( empty($username) || empty($password)){
-            $error = "Veuillez remplir tous les champs.";
-        }else{
-            //Récupération des informations des utilisateurs$
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $nom = htmlspecialchars($_POST['nom']);
+    $password = htmlspecialchars($_POST['password']);
 
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username");
-            $stmt->execute(['username' => $username]);
-            $user = $stmt->fetch();
+    if (empty($nom) || empty($password)) {
+        $error = "Veuillez remplir tous les champs.";
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE nom = :nom");
+        $stmt->execute(['nom' => $nom]);
+        $user = $stmt->fetch();
 
-            //Vérification du mot de passe
-            if($user && password_verify($password, $user['password'])){
-                $_SESSION['username'] = $username;
-                header("Location: dashboard.php");
-                exit();
-            }else{
-                $error = "Nom d'utilisateur ou mot de passe incorrect.";
-            }
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['nom'] = $nom;
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $error = "Nom d'utilisateur ou mot de passe incorrect.";
         }
     }
-
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,14 +38,14 @@
 <body>
 
     <h1>Connexion</h1>
-    <?php if (isset($error)) echo "<p style='color:red;>$error</p>" ?>
-    <?php if (isset($success)) echo "<p style='color:green;>$success</p>" ?>
+    <?php if (isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
+    <?php if (isset($success)) echo "<p style='color:green;'>$success</p>"; ?>
     <form action="login.php" method="POST">
-        <input type="text" name="username" placeholder="Nom d'utilisateur" required><br>
+        <input type="text" name="nom" placeholder="Nom d'utilisateur" required><br>
         <input type="password" name="password" placeholder="Mot de passe" required>
         <button type="submit">Se connecter</button>
-
     </form>
-    <p>Vous n'avez pas encore de comtpe ? <a href="register.php">S'inscrire</a></p>
+    <p>Vous n'avez pas encore de compte ? <a href="register.php">S'inscrire</a></p>
 </body>
 </html>
+

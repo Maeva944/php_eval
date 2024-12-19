@@ -1,45 +1,57 @@
 <?php
-    session_start();
-    require_once '../Database.php';
-    require_once 'header.php';
+session_start();
+require_once '../Database.php';
+require_once 'header.php';
+require_once '../classes/Utilisateur.php';
 
-    if($_SERVER['REQUEST_METHOD'] == 'POST'){
-        //Récupération des champs du formulaire
-        $username = htmlspecialchars($_POST['username']);
-        $password = htmlspecialchars($_POST['password']);
+global $pdo;
+$database = new Database();
+$pdo = $database->pdo;
 
-        //Vérification des champs vides
-        if( empty($username) || empty($password)){
-            $error = "Veuillez remplir tous les champs.";
-        }else{
-            //hashage du mot de passe
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Récupération des champs du formulaire
+    $nom = htmlspecialchars($_POST['nom']);
+    $email = htmlspecialchars($_POST['email']);
+    $password = htmlspecialchars($_POST['password']);
+
+    // Vérification des champs vides
+    if (empty($nom) || empty($password) || empty($email)) {
+        $error = "Veuillez remplir tous les champs.";
+    } else {
+        // Hashage du mot de passe
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insertion des données dans la table Utilisateurs
+        $stmt = $pdo->prepare("INSERT INTO Utilisateurs(nom, password, email) VALUES (:nom, :password, :email)");
+        $stmt->execute(['nom' => $nom, 'password' => $hashed_password, 'email' => $email]);
         
-            //Préparation et exécution de la requête SQL
-            $stmt = $pdo->prepare("INSERT INTO users(username, password) VALUES (:username, :password)");
-            $stmt->execute(['username' => $username, 'password' => $hashed_password]);
-            $succes = "Inscription réussie ! Vous pouvez vous connecter dès maintenant."; 
-        }
+        $success = "Inscription réussie ! Vous pouvez vous connecter dès maintenant.";
     }
-
+}
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Inscription</title>
 </head>
 <body>
-
     <h1>Inscription</h1>
-    <?php if (isset($error)) echo "<p style='color:red';>$error</p>" ?>
-    <?php if (isset($succes)) echo "<p style='color:green';>$succes</p>" ?>
-    <form action="register.php" method="POST">
-        <input type="text" name="username" placeholder="Nom d'utilisateur" required><br>
-        <input type="password" name="password" placeholder="Mot de passe" required>
-        <button type="submit">S'inscrire</button>
 
+    <!-- Affichage des messages d'erreur ou de succès -->
+    <?php if (isset($error)): ?>
+        <p style="color:red;"><?php echo $error; ?></p>
+    <?php endif; ?>
+    <?php if (isset($success)): ?>
+        <p style="color:green;"><?php echo $success; ?></p>
+    <?php endif; ?>
+
+    <form action="register.php" method="POST">
+        <input type="text" name="nom" placeholder="Nom d'utilisateur" required><br>
+        <input type="text" name="email" placeholder="email" required><br>
+        <input type="password" name="password" placeholder="Mot de passe" required><br>
+        <button type="submit">S'inscrire</button>
     </form>
 
     <p>Vous avez déjà un compte ? <a href="login.php">Se connecter</a></p>
