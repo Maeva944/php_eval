@@ -1,6 +1,7 @@
 <?php
     session_start();
     require_once '../Database.php';
+    require_once 'header.php';
 
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         //Récupération des champs du formulaire

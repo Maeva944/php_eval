@@ -1,6 +1,7 @@
 <?php
     session_start();
     require_once '../Database.php';
+    require_once 'header.php';
 
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         //Récupération des champs du formulaire
@@ -17,7 +18,7 @@
             //Préparation et exécution de la requête SQL
             $stmt = $pdo->prepare("INSERT INTO users(username, password) VALUES (:username, :password)");
             $stmt->execute(['username' => $username, 'password' => $hashed_password]);
-            $succes = "Inscription réussie ! Vous pouvez vous connecter."; 
+            $succes = "Inscription réussie ! Vous pouvez vous connecter dès maintenant."; 
         }
     }
 
