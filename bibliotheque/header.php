@@ -11,5 +11,5 @@
         <a href="index.php">
             <img src="../asset/img/istockphoto-1270155083-612x612-removebg-preview.png">
         </a>
-        <p><a href="register.php">Inscription</a> | <a href="login.php">Connexion</a></p>
+        <p><a href="register.php">Inscription</a> | <a href="login.php">Connexion</a> | <a href="favoris.php">Mes favoris</a> | <a href="dashboard.php">Tableau de bord</a></p>
 </header>
